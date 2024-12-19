@@ -1,0 +1,58 @@
+name: Node.js CI
+
+# Trigger the workflow on specific events
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Define the steps for the workflow
+    steps:
+      # Checkout the code from the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.17.0 # Specify the Node.js version
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Run tests
+      - name: Run tests
+        run: npm test
+
+      # Build the application (optional)
+      - name: Build application
+        run: npm run build
+
+- name: Cache Node.js modules
+  uses: actions/cache@v3
+  with:
+    path: ~/.npm
+    key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+    restore-keys: |
+      ${{ runner.os }}-node-
+
+- name: Run linter
+  run: npm run lint
+
+  - name: Upload build artifacts
+  uses: actions/upload-artifact@v3
+  with:
+    name: build
+    path: ./build
+
+
+  
